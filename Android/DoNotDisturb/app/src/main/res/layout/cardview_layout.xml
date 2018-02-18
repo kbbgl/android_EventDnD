@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
     tools:context="com.privat.kobbigal.donotdisturb.MainActivity">
 
     <android.support.v7.widget.CardView
@@ -12,26 +13,28 @@
         android:layout_height="100dp"
         android:layout_gravity="center"
         app:cardCornerRadius="30dp"
-        app:cardElevation="10dp"
         app:cardBackgroundColor="@color/colorPrimary">
 
         <TextView
             android:id="@+id/event_title_TV"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:fontFamily="@font/geostar_fill"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/nixie_one"
             android:gravity="start"
             android:text="Test"
-            android:textSize="26sp" />
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/event_time_TV"
-            android:text="Mon Nov 19 12:00:00 GMT+02:00 2018"
             android:textSize="16sp"
             android:gravity="center_vertical"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="git5dp"
             android:layout_width="wrap_content"
+            android:fontFamily="@font/nixie_one"
+            android:text="Mon, 19 Feb 11:30"
             android:layout_height="match_parent" />
 
         <Switch

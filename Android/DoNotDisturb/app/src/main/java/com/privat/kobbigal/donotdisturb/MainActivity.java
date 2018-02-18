@@ -14,10 +14,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,15 +32,30 @@ import me.everything.providers.android.calendar.CalendarProvider;
 public class MainActivity extends AppCompatActivity {
 
 //    private final int REQUEST_PERMISSIONS = 1;
+
+    private static RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView recyclerView;
+    private static ArrayList<Event> eventsList;
+    static View.OnClickListener mOnClickListener;
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        
+        mOnClickListener = new CustomOnClickListener(this);
+
+        layoutManager = new LinearLayoutManager(this);
+
+        recyclerView = findViewById(R.id.event_RV);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
+        // Permission check
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 
@@ -45,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
 
+                eventsList = new ArrayList<>();
                 ContentResolver contentResolver = getContentResolver();
                 Uri eventsURI = CalendarContract.Events.CONTENT_URI;
                 Uri calendarsURI = CalendarContract.Calendars.CONTENT_URI;
@@ -71,11 +92,12 @@ public class MainActivity extends AppCompatActivity {
                 Date time = new Date(systemTime);
 
                 /*
-                Filter:
-                // future
-                // non-all day
-                // confirmed
+                /* Filter:
+                /* future
+                /* non-all day
+                /* confirmed
                 */
+
                 String selection = "(" +
                         "( " + CalendarContract.Events.DTSTART + " >= ? )" +
                         "AND " +
@@ -83,12 +105,11 @@ public class MainActivity extends AppCompatActivity {
                         "AND " +
                         "( " + CalendarContract.Events.STATUS_CONFIRMED + " == 1 )" +
                                     ")";
-
-
                 String selectionArgs[] = new String[] {String.valueOf(systemTime)};
 
                 Cursor cursor = contentResolver.query(eventsURI, null, selection, selectionArgs, CalendarContract.Events.DTSTART + " ASC");
 
+                // Read data
                 assert cursor != null;
                 while (cursor.moveToNext()) {
 
@@ -103,10 +124,14 @@ public class MainActivity extends AppCompatActivity {
                     Date eventStartDate = new Date(startTimeValue);
 
                     Log.i("Event Details", titleValue + ", " + descriptionValue + ", " + eventStartDate.toString());
+                    eventsList.add(new Event(titleValue, descriptionValue, eventStartDate));
                 }
 
                 cursor.close();
                 Log.i("systemTime", time.toString());
+
+                adapter = new CustomAdapter(eventsList);
+                recyclerView.setAdapter(adapter);
             }
         }
     }
